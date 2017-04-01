@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>MotaEvent.qml</file>
+        <file>MotaActor.qml</file>
+        <file>MotaFight.qml</file>
+        <file>MotaMap.qml</file>
+        <file>MotaUI.qml</file>
+        <file>MotaParser.qml</file>
+        <file>data.json</file>
+        <file>MotaDeal.qml</file>
+        <file>MotaMusic.qml</file>
+        <file>MotaRectangle.qml</file>
+        <file>MotaNpc.qml</file>
+    </qresource>
+</RCC>
