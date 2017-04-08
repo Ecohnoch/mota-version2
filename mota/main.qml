@@ -47,6 +47,10 @@ Rectangle{
         id: deal
     }
 
+    MotaFight{
+        id: fight
+    }
+
     MotaUI{
         id: ui
     }

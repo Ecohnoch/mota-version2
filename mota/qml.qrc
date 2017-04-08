@@ -12,5 +12,6 @@
         <file>MotaMusic.qml</file>
         <file>MotaRectangle.qml</file>
         <file>MotaNpc.qml</file>
+        <file>enemy.json</file>
     </qresource>
 </RCC>

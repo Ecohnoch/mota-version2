@@ -41,4 +41,15 @@ Item {
         bgm.volume = v
     }
 
+    function mainBgm(){
+        bgm._switchTo("Balloon.mp3")
+    }
+
+    function fightSe(){
+        musicPlayer._switchTo("fight2.wav")
+    }
+
+    function fightBgm(){
+        bgm._switchTo("fightBgm.mp3")
+    }
 }

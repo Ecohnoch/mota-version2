@@ -3,7 +3,7 @@ Rectangle {
     property int what:{
         if(index % 20 == 0 || index % 20 == 19 || index <= 20 || index >= 380) return 1 //must be
         //  test start
-        else if(index == 43) return 2
+        else if(index == 43) return 7
         //  test end
         else return 0
     }

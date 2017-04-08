@@ -13,9 +13,9 @@ Item {
     property int cur_x: 30
     property int cur_y: 540
 
-    property int blood: 1000
-    property int force: 10
-    property int defend: 10
+    property int blood: 10000
+    property int force: 100
+    property int defend: 100
     property int money: 100
     property int exp: 100
     property var mainTable: [blood, force, defend, money, exp]
@@ -55,10 +55,10 @@ Item {
             people.y = nowY
             music.switchToSe('cj003.wav')
         }else{
-            doWhat(what)
+            doWhat(what, position)
         }
     }
-    function doWhat(wall){
+    function doWhat(wall, p){
         switch(wall){
         case 1:
             music.switchToSe('hitWall.wav')
@@ -80,7 +80,8 @@ Item {
             music.switchToSe('hitWall.wav')
             break
         case 7:
-            music.switchToSe('hitWall.wav')
+            fight.startFight(7)
+            map.getItem(p).what = 0
             break
         case 8:
             music.switchToSe('hitWall.wav')

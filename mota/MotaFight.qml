@@ -1,121 +1,193 @@
-import QtGraphicalEffects 1.0
 import QtQuick 2.7
 import QtQuick.Controls 2.0
-import QtMultimedia 5.4
 
-Item {
-    x: 100
-    property var efor: json.efor
-    property var edef: json.edef
-    property var eblo: json.eblo
-    property var ename:json.ename
+import Mota.File 1.0
 
+Item{
+    id: fight
+
+    property int eBlood: 10
+    property int eForce: 11
+    property int eDefend: 9
 
     Image{
         id: fightBg
         visible: false
         width: 400; height: 400
-        x: 100; y: 100
+        x: 200; y: 100
         source: "image/ui4.png"
         Image{
-            id: fight1
+            id: fighter1
             source:""
             width: 30; height: 30
             x: 20; y: 20
         }
         Image{
-            id: fight2
+            id: fighter2
             source: ""
             width: 30; height: 30
             x: 333; y: 20
         }
-        function fightUI(x){
-            fight1.source = "image/actor.png"
-            fight2.source = "image/"+cell.isWhat[x+6]+".png"
+        function fighters(x){
+            fighter1.source = "image/actor.png"
+            fighter2.source = "image/" + map.isWhat[x + 6] + ".png"
             console.log(x)
         }
+
         Repeater{
-            id: fight1repeater
+            id: fighter1Character
             model: 3
             Text{
-                x: 46; y:138+(index)*100
-                text: actor.mainTable[index]
+                x: 46; y:138 + (index) * 100
+                text: you.mainTable[index]
                 font.family: "Arial"
                 font.pixelSize: 22
                 color: "red"
             }
         }
         Repeater{
-            id: fight2repeater
+            id: fighter2Character
             model: 3
             Text{
-                x: 294 ;y: 138+(index)*100
-                text: actor.e_table[index]
+                x: 294 ;y: 138 + (index) * 100
+                text: eCharacter(index)
+                function eCharacter(x){
+                    if(x === 0) return eBlood
+                    if(x === 1) return eForce
+                    if(x === 2) return eDefend
+                }
+
                 font.family: "Arial"
                 font.pixelSize: 22
                 color: "red"
             }
         }
     }
-
 
     Timer{
         id: fightStart
         interval: 1000
-        running:false
-        property int myNumber: 0
-        property int myFight: 0
+        running: false
         onTriggered: {
-              startFight(myNumber, myFight)
+            eachRound(yB, eB, yH, eH)
+            checkFight(yB, eB, yH, eH, whichE)
         }
-        property int times: 0
-    }
-    function _timeSet(t){
-        fightStart.interval = t
     }
 
-    function timeSet(num,i){
-        fightStart.myNumber = num
-        fightStart.myFight = i
-        fightStart.restart()
-    }
-    function startFight(x, i){
-        var realX = x - 6
-        var delBlood = actor.force - actor.e_defend
-        var myDel = actor.e_force - actor.defend
-        if(fightStart.times === 0){
-            actor.e_force = efor[realX]; actor.e_defend = edef[realX]; actor.e_blood = eblo[realX]
+    property int yB  // your blood
+    property int eB  // enemy blood
+    property int yH  // your hurt to enemy
+    property int eH  // enemy hurt to you
+    property int whichE  // which enemy you fight with
+
+    function startFight(x){
+        var yourF = you.force, yourD = you.defend
+        yB = you.blood
+
+        // name
+        for(var thisEnemy in enemyData.enemy[x]){
+            eForce = enemyData.enemy[x][thisEnemy][1]
+            eDefend = enemyData.enemy[x][thisEnemy][2]
+            eB = enemyData.enemy[x][thisEnemy][0]
+            eBlood = eB
         }
-        if(delBlood <= 0) {return }  //can't fight, play music keng~
-        if(myDel <= 0) myDel = 0
-        fightBg.visible = true
-        event.transing = false
-        fightBg.fightUI(realX)
-        fightStart.times++
-        actor.e_blood = actor.e_blood - delBlood
-        actor.blood = actor.blood - myDel
 
-        if(actor.blood <= 1000) music.switchToSe('gz_bgj.wav')
-        else music.switchToSe('gz_gj.wav')
+           // should input a list
+        whichE = x
 
-        if(actor.blood <= 0){
-            event.transing = false; cell.visible = false; fight.visible = false
+        if(eDefend >= yourF){
+            console.log("can't fight")
+            stopFight()
             return
         }
-        else if(actor.e_blood>0){
-            fightStart.restart()
+
+        yH = (yourF - eDefend > 0) ? (yourF - eDefend) : 0
+        eH = (eForce - yourD > 0) ? (eForce - yourD) : 0
+        console.log("test:" ,yH, eH)
+        if(!yH){
+
         }
-        else if(actor.e_blood <= 0){
-            actor.money += json.money[realX]
-            actor.exp += json.exp[realX]
-            fightStart.times = 0
-            fightStart.stop()
-            fightBg.visible = false
-            music.switchTo('Balloon.mp3')
-            event.transing = true
-            console.log("fight end!!!!")
+        if(!eH){
+
+        }
+        showFightBg()
+        music.fightBgm()
+        fightStart.restart()
+
+    }
+
+    function showFightBg(){
+        fightBg.visible = true
+        // music
+    }
+    function hideFightBg(){
+        fightBg.visible = false
+    }
+
+    function eachRound(yourB, enB, yourHurt, eHurt){
+        console.log("Round start!")
+        music.fightSe()
+        yourB = yourB - eHurt
+        you.blood = yourB
+        yB = yourB
+
+        console.log(enB)
+        enB = enB - yourHurt
+        eBlood = enB
+        eB = enB
+    }
+
+    function checkFight(yourB, eB, yourHurt, eHurt){
+        if(yourB <= 0){
+            console.log("You dead!!")
+            return
+        }
+        if(eB <= 0){
+            getAward(whichE)
+            stopFight()
+            enemyDisappear()
+            return
+        }
+        console.log("ready to start 2nd round", yB, eB, yH, eH)
+        fightStart.restart()
+    }
+
+    function getAward(x){
+        for(var thisEnemy in enemyData.enemy[x]){
+            you._addMoney(enemyData.enemy[x][thisEnemy][3])
+            you._addExp(enemyData.enemy[x][thisEnemy][4])
+            console.log("Award: ", enemyData.enemy[x][thisEnemy][3])
         }
     }
 
+    function enemyDisappear(){
 
+    }
+
+    function stopFight(){
+        hideFightBg()
+        music.mainBgm()
+        eBlood = 100
+        eForce = 11
+        eDefend = 9
+        yB = 0
+        eB = 0
+        yH = 0
+        eH = 0
+        whichE = 0
+    }
+
+
+    property var enemyData
+    Component.onCompleted: {
+        var d = File.read(':/enemy.json')
+        enemyData = JSON.parse(d)
+
+        for(var i in enemyData){
+            console.log("key: ", i, "value: ", enemyData[i])
+        }
+
+        console.log(enemyData.enemy[0], enemyData.enemy[1])
+
+    }
 }
